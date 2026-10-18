@@ -1,0 +1,558 @@
+/* ============================================================================
+   realhub-tokens.css — the surface system, defined once
+   ============================================================================
+   Rod: "A pet peeve of mine is inconsistency... In the Loan, Property & Title
+   tab, the contour on the round corners are slightly faded. In other parts it
+   is not. Please make sure that everything looks the same."
+
+   He is describing a symptom of something structural. A count across the app
+   before this file existed:
+
+       294 x border-radius: 8px        86 x 14px        21 x 4px
+       147 x 10px                      45 x 7px          9 x 9px
+       106 x 6px                       40 x 12px         8 x 5px
+
+   Ten different corner radii, plus eight different box-shadow recipes, none of
+   them sharing a definition. Every screen was its own opinion, so two panels
+   next to each other agreed only by luck — and when they disagreed by two
+   pixels it read exactly as Rod describes it: faded, or slightly off, with
+   nothing obviously wrong.
+
+   The calculators had tokens but each page declared its own values (--radius
+   was 10px in calc-shell.css, 12px in buy_hold, 14px in w2_future), and the
+   app pages had no tokens at all. Two disconnected worlds, both drifting.
+
+   This is the one definition now. The app loads it through realhub-ui.js; the
+   calculators load it through calc-shell.css, which imports it. Changing a
+   corner here changes every corner in the product, which is the only way
+   "everything looks the same" stays true after the next screen is built.
+   ========================================================================= */
+
+:root {
+  color-scheme: light;
+  /* -- brand ------------------------------------------------------------- */
+  --brand-1: #0e66a8;
+  --brand-2: #1c4b7b;
+  --brand-soft: #e5eff7;
+  --accent-1: #f39c1f;
+  --accent-2: #f08d25;
+  --accent-soft: #fdf0e0;
+
+  /* -- surfaces ---------------------------------------------------------- */
+  /* --bg is the canvas everything sits on: the page behind a calculator, and
+     the tint behind the panels on a deal tab. --card is what sits on it. */
+  --bg: #f6f8fb;
+  --card: #ffffff;
+  --surface-2: #ebedef;
+  --border: #e5e9ef;
+  /* A quiet fill for a card header or a table head: lighter than --surface-2,
+     which was being used for both and was too dark for one of them. */
+  --surface-1: #fafbfc;
+  /* Every dialog dims the page behind it. There were eight different dimmings. */
+  --scrim: rgba(15, 30, 50, .45);
+
+  /* -- text -------------------------------------------------------------- */
+  --text: #1a2434;
+  --muted: #6d747a;
+  --muted-2: #94a3b8;
+
+  /* -- status ------------------------------------------------------------ */
+  --ok: #22945b;   --ok-soft: #e5f6ec;
+  --warn: #d68b1c; --warn-soft: #fdf0e0;
+  --err: #c64545;  --err-soft: #fdecec;
+  /* A fourth step between amber and red, for the ratio bands Rod asked for on
+     2026-09-23: a 47% DTI is not a 42% DTI and it is not a 55% DTI either.
+
+     Picked by measurement, not by eye. Against white it runs 6.8:1, which
+     clears AA on the 13px the vitals bar renders at; against --warn it is
+     2.5:1, so the two ambers are plainly different rather than "a bit
+     darker". Against --err it is only 1.4:1 — the weakest pair in the ramp,
+     and the honest limit of a four-step scale that ends in red. They separate
+     by hue (burnt orange against a muted red) and the ratio itself is right
+     next to the colour, so nothing here rests on the colour alone. */
+  --warn-2: #8f4700;
+
+  /* -- what changes for dark mode (migration 85) ------------------------
+     A colour used as TEXT can't always be the colour used as a FILL: the
+     brand blue is a fine button behind white words, but as words on a dark
+     card it is too dim to read. So text gets its own names. In light mode each
+     is exactly the colour it replaced; only the dark block below differs. */
+  --brand-text: #0e66a8;          /* links, blue labels      (= --brand-1) */
+  --brand-2-text: #1c4b7b;        /* headings, panel titles  (= --brand-2) */
+  --text-2: #334155;              /* secondary words, darker than --muted */
+  --border-strong: #cbd5e1;       /* an input's edge, a divider that must show */
+  --warn-text: #b45309;           /* amber words on a light ground */
+  --err-text: #c64545;            /* (= --err) */
+  --ok-text: #22945b;             /* (= --ok) */
+  /* A soft edge around a soft fill (a red note's border, say). */
+  --err-line: #f3c7c7;
+  --warn-line: #fde68a;
+  --ok-line: #a7d7b5;
+  /* Financial Info's totals: assets purple, debts burnt orange. */
+  --assets-text: #7c3aed;
+  --assets-soft: #f3e8ff;
+  --liab-text: #c2410c;
+  /* The left menu: the same deep blue in light mode as always; darker in
+     dark mode so it doesn't outshine the page. */
+  --nav-1: #0f2b47;
+  --nav-2: #1c4b7b;
+  /* Paper: what a client receives — a letter, a PDF page, an email — stays
+     white in dark mode too, the way it will look when they open it. */
+  --paper: #ffffff;
+  --paper-text: #1f2933;
+
+  /* -- corners ----------------------------------------------------------- */
+  /* Three sizes, by what the thing is rather than by how it looked that day.
+     A panel, a dialog and a card are all --radius. An input, a button and a
+     chip are all --radius-sm. Anything smaller than a button is --radius-xs. */
+  --radius: 10px;
+  --radius-sm: 7px;
+  --radius-xs: 5px;
+  --radius-pill: 999px;
+
+  /* -- elevation --------------------------------------------------------- */
+  /* Three steps, by how far off the page the thing is meant to read.
+     1 rests on the canvas, 2 floats over content, 3 covers it. */
+  --shadow-1: 0 1px 2px rgba(15, 30, 50, .05);
+  --shadow-2: 0 4px 14px rgba(15, 30, 50, .10);
+  --shadow-3: 0 18px 50px rgba(15, 30, 50, .28);
+  /* The calculators' old name for a resting surface. Kept pointing at the new
+     one so their existing rules did not all need rewriting at once. */
+  --shadow: var(--shadow-1);
+  --shadow-sm: var(--shadow-1);
+  --shadow-md: var(--shadow-2);
+  --shadow-lg: var(--shadow-3);
+
+  /* -- focus ------------------------------------------------------------- */
+  --focus-ring: rgba(14, 102, 168, .18);
+
+  /* -- the older names, mapped rather than redefined ---------------------
+     Calculators written before the tokens existed say var(--primary) and
+     var(--surface). Mapping them here means those pages get the app's blue and
+     the app's white without every one of them being rewritten, and they follow
+     when a token moves. Removing this block is what turned the W-2's cards
+     transparent: `background: var(--surface)` with no --surface anywhere is not
+     an error, it is simply dropped, so the card lost its fill and the page tint
+     showed through. Nothing warns you. */
+  --surface: var(--card);
+  --ink: var(--text);
+  --primary: var(--brand-1);
+  --primary-light: var(--brand-soft);
+  --accent: var(--accent-1);
+  --success: var(--ok);
+  --success-soft: var(--ok-soft);
+  --success-light: var(--ok-soft);
+  --warning: var(--warn);
+  --warning-light: var(--warn-soft);
+  --danger: var(--err);
+  --danger-light: var(--err-soft);
+  --info: var(--brand-1);
+  --info-soft: var(--brand-soft);
+  --radius-md: var(--radius);
+  /* Deal Analyzer splits a funding stack between the two sides of it. */
+  --lender: var(--brand-1);
+  --investor: var(--accent-1);
+
+  /* -- shell ------------------------------------------------------------- */
+  --sidenav-w: 220px;
+  --sidenav-w-collapsed: 56px;
+  --topbar-h: 48px;
+}
+
+/* ---------------------------------------------------------------- dark ---
+   Each person's own setting (Settings › Appearance, migration 85), put on
+   html[data-theme] by js/realhub-theme-boot.js before the page is drawn:
+   'light' (the default), 'dark', or 'auto' — which follows the computer
+   through the media query. The two blocks hold the same values on purpose. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0f1621;
+    --card: #141d29;
+    --surface-2: #17202e;
+    --border: #253141;
+    --surface-1: #19222f;
+    --scrim: rgba(0, 0, 0, .60);
+    --text: #e6ecf3;
+    --muted: #95a3b4;
+    --muted-2: #6b7a8c;
+    --brand-soft: #14304a;
+    --accent-soft: #3a2a12;
+    --ok-soft: #12301f;
+    --warn-soft: #3a2a12;
+    --err-soft: #3a1a1a;
+    --warn-2: #e2761f;
+    --brand-text: #6cb4ec;
+    --brand-2-text: #a9cdef;
+    --text-2: #c3ccd7;
+    --border-strong: #3a4a5f;
+    --warn-text: #f0b45a;
+    --err-text: #f08a8a;
+    --ok-text: #5fd39c;
+    --err-line: #5a2a2e;
+    --warn-line: #5a4318;
+    --ok-line: #1f4d33;
+    --assets-text: #b79cf5;
+    --assets-soft: #2a1f45;
+    --liab-text: #f59e6b;
+    --nav-1: #0a1726;
+    --nav-2: #10263d;
+    --focus-ring: rgba(108, 180, 236, .30);
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, .35);
+    --shadow-2: 0 4px 14px rgba(0, 0, 0, .45);
+    --shadow-3: 0 18px 50px rgba(0, 0, 0, .60);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0f1621;
+  --card: #141d29;
+  --surface-2: #17202e;
+  --border: #253141;
+  --surface-1: #19222f;
+  --scrim: rgba(0, 0, 0, .60);
+  --text: #e6ecf3;
+  --muted: #95a3b4;
+  --muted-2: #6b7a8c;
+  --brand-soft: #14304a;
+  --accent-soft: #3a2a12;
+  --ok-soft: #12301f;
+  --warn-soft: #3a2a12;
+  --err-soft: #3a1a1a;
+  --warn-2: #e2761f;
+  --brand-text: #6cb4ec;
+  --brand-2-text: #a9cdef;
+  --text-2: #c3ccd7;
+  --border-strong: #3a4a5f;
+  --warn-text: #f0b45a;
+  --err-text: #f08a8a;
+  --ok-text: #5fd39c;
+  --err-line: #5a2a2e;
+  --warn-line: #5a4318;
+  --ok-line: #1f4d33;
+  --assets-text: #b79cf5;
+  --assets-soft: #2a1f45;
+  --liab-text: #f59e6b;
+  --nav-1: #0a1726;
+  --nav-2: #10263d;
+  --focus-ring: rgba(108, 180, 236, .30);
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, .35);
+  --shadow-2: 0 4px 14px rgba(0, 0, 0, .45);
+  --shadow-3: 0 18px 50px rgba(0, 0, 0, .60);
+}
+
+/* Paper is always light: printing in dark mode prints the light colours. */
+@media print {
+  :root[data-theme] {
+    color-scheme: light;
+    --bg: #f6f8fb;
+    --card: #ffffff;
+    --surface-2: #ebedef;
+    --border: #e5e9ef;
+    --surface-1: #fafbfc;
+    --scrim: rgba(15, 30, 50, .45);
+    --text: #1a2434;
+    --muted: #6d747a;
+    --muted-2: #94a3b8;
+    --brand-soft: #e5eff7;
+    --accent-soft: #fdf0e0;
+    --ok-soft: #e5f6ec;
+    --warn-soft: #fdf0e0;
+    --err-soft: #fdecec;
+    --warn-2: #8f4700;
+    --brand-text: #0e66a8;
+    --brand-2-text: #1c4b7b;
+    --text-2: #334155;
+    --border-strong: #cbd5e1;
+    --warn-text: #b45309;
+    --err-text: #c64545;
+    --ok-text: #22945b;
+    --err-line: #f3c7c7;
+    --warn-line: #fde68a;
+    --ok-line: #a7d7b5;
+    --assets-text: #7c3aed;
+    --assets-soft: #f3e8ff;
+    --liab-text: #c2410c;
+    --nav-1: #0f2b47;
+    --nav-2: #1c4b7b;
+    --focus-ring: rgba(14, 102, 168, .18);
+    --shadow-1: 0 1px 2px rgba(15, 30, 50, .05);
+    --shadow-2: 0 4px 14px rgba(15, 30, 50, .10);
+    --shadow-3: 0 18px 50px rgba(15, 30, 50, .28);
+  }
+}
+
+/* ==========================================================================
+   The primitives every screen builds from.
+
+   A screen that uses these gets the look for free and keeps it when the tokens
+   change. A screen that hand-rolls a card is how we got here.
+   ========================================================================== */
+
+/* The tinted ground. Panels sit on it; nothing sits on it bare. */
+.rh-canvas { background: var(--bg); }
+
+/* A block of related fields. One border, one radius, one shadow, everywhere. */
+.rh-panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-1);
+  padding: 16px 18px;
+  margin-bottom: var(--sec-gap);
+}
+.rh-panel > *:last-child { margin-bottom: 0; }
+
+/* What the block is called. Small, quiet, brand-coloured. */
+.rh-panel-title {
+  margin: 0 0 13px;
+  font-size: 10.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em;
+  color: var(--brand-text);
+}
+
+/* ---------------------------------------------------- section navigation --
+   A strip of sub-tabs that jump to parts of one page, with a bar under the one
+   you are in. Rod: "you took away the little bars indicating the sub-section
+   the user is in. It's better to have that." and "keep the horizontal bar
+   containing sub-sections sticky on the page."
+
+   The bar has to sit ON a track, not float in space: a 2px mark under a button
+   with nothing beside it reads as a rendering fault rather than a position. So
+   the strip draws a hairline across its full width and the current tab paints
+   over it. Defined here because two screens use it and a third will. */
+.rh-subnav {
+  position: sticky; top: 0; z-index: 30;
+  display: flex; gap: 2px; align-items: flex-end;
+  background: var(--card);
+  box-shadow: inset 0 -1px 0 var(--border);
+}
+.rh-subnav button {
+  font: inherit; font-size: 13px; font-weight: 600;
+  background: none; border: 0; cursor: pointer;
+  padding: 10px 14px; color: var(--muted);
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.rh-subnav button:hover { color: var(--text); }
+.rh-subnav button.on { color: var(--brand-text); border-bottom-color: var(--brand-1); }
+
+/* A dialog: a panel that covers the page instead of resting on it. */
+.rh-dialog {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-3);
+}
+.rh-scrim { position: fixed; inset: 0; background: var(--scrim); }
+
+/* ---------------------------------------------------------------------------
+   The information bubble
+   ---------------------------------------------------------------------------
+   Rod, 2026-09-21, on the (i) beside Income Calculator Reference Number: "the
+   'i' ... should display this information on hover."
+
+   It was a `title` attribute, which is the browser's tooltip: a second and a
+   half of nothing, then grey system text in the corner of the cursor. Fine for
+   a hint nobody needs. Wrong for a field where the hint IS the instruction.
+
+   Defined here rather than in the one screen that asked for it, because the
+   next screen will want one and two tooltips that disagree by three pixels is
+   exactly the complaint this file exists to answer.
+
+     <span class="rh-info" tabindex="0" role="note" aria-label="…">&#9432;
+       <span class="rh-tip">eg: D123ABC (Currently applicable for DU only)</span>
+     </span>
+
+   Sits above its mark with the arrow pointing down at it, because these are
+   almost always beside a label with an input directly underneath, and a bubble
+   below would cover the field it is explaining.
+   --------------------------------------------------------------------------- */
+.rh-info {
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 15px; height: 15px; border-radius: var(--radius-pill);
+  background: var(--muted-2); color: var(--card);
+  font-size: 10px; font-weight: 700; font-style: normal; line-height: 1;
+  vertical-align: middle; margin-left: 5px;
+  cursor: help; user-select: none;
+}
+.rh-info:focus-visible { outline: 2px solid var(--brand-1); outline-offset: 2px; }
+
+.rh-info > .rh-tip {
+  position: absolute; bottom: calc(100% + 10px); left: 50%;
+  transform: translateX(-50%);
+  width: max-content; max-width: 280px;
+  padding: 9px 13px;
+  background: var(--card); color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow-2);
+  font-size: 13px; font-weight: 400; font-style: normal;
+  line-height: 1.35; text-align: left; white-space: normal;
+  opacity: 0; visibility: hidden;
+  transition: opacity .12s ease, visibility .12s ease;
+  pointer-events: none; z-index: 60;
+}
+/* The arrow is the bubble's own corner turned forty-five degrees, so it
+   inherits the border and can never drift a shade away from it. */
+.rh-info > .rh-tip::after {
+  content: ''; position: absolute; top: 100%; left: 50%;
+  width: 9px; height: 9px; margin: -5px 0 0 -4.5px;
+  background: var(--card);
+  border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  transform: rotate(45deg);
+}
+.rh-info:hover > .rh-tip,
+.rh-info:focus > .rh-tip,
+.rh-info:focus-visible > .rh-tip { opacity: 1; visibility: visible; }
+
+/* A centred bubble is 140px wide in each direction, and the panels it sits in
+   clip whatever crosses their edge (.ai-modal is overflow:hidden). So near an
+   edge, anchor the bubble to the mark and let it grow the other way: .left
+   when there is room to the right, .right when the room is to the left, which
+   is the usual case for a mark that follows a long label. */
+.rh-info.left > .rh-tip {
+  left: -6px; right: auto; transform: none;
+}
+.rh-info.left > .rh-tip::after { left: 12px; margin-left: 0; }
+
+.rh-info.right > .rh-tip {
+  left: auto; right: -6px; transform: none;
+}
+.rh-info.right > .rh-tip::after {
+  left: auto; right: 12px; margin-left: 0; margin-right: -4.5px;
+}
+
+/* ---------------------------------------------------------------------------
+   The note
+   ---------------------------------------------------------------------------
+   A short block that tells the LO something about what is on screen: a rule
+   that applies, a figure that needs checking, a thing to do before closing.
+
+   Add Income grew one of these for itself (.ai-note) and the Loan screen had
+   none at all, so the VA funding fee warnings had nowhere to live. Defined
+   here for the same reason as .rh-info: the third screen that needs one should
+   not be inventing a third shade of blue.
+
+     <div class="rh-note warn">
+       <b>This cannot be an IRRRL</b>
+       <div>An IRRRL refinances an existing VA loan...</div>
+     </div>
+
+   Default is informational. `warn` is for something the LO has to act on
+   before the file closes — not for an error, which is what --err is for.
+   --------------------------------------------------------------------------- */
+.rh-note {
+  border-left: 3px solid var(--brand-1);
+  background: var(--brand-soft);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 10px 13px;
+  margin: 10px 0 14px;
+}
+.rh-note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.rh-note.bad  { border-left-color: var(--err);  background: var(--err-soft); }
+.rh-note > b {
+  display: block;
+  font-size: 12.5px; font-weight: 700; color: var(--text);
+  margin-bottom: 4px;
+}
+.rh-note > div { font-size: 12.5px; line-height: 1.55; color: var(--text); }
+.rh-note .cite { margin-top: 6px; font-size: 11px; color: var(--muted); }
+
+
+/* ============================================================================
+   Field type scale — one definition, read by every form in the app
+   ============================================================================
+   Rod, 2026-09-24: "I'd like to have a 15% reduction in font size for all the
+   fields and fields titles. The application is too big. It feels that space
+   can be utilized better."
+
+   Every form screen used to set its own: 12px labels on the Loan tab, 11.5px
+   on Borrower Info, 11.5px again in four dialogs, and inputs at 13.5px, 13.5px
+   and 13px. Six places to change and six chances to change five of them —
+   which is the shape of the complaint Rod has made more than once: "A pet
+   peeve of mine is inconsistency."
+
+   So the scale lives here and the screens read it. The arithmetic, once:
+
+     label   12   x 0.90 = 10.8
+     input   13.5 x 0.90 = 12.15
+     dense   12.5 x 0.90 = 11.25   (table cells, chips, toggles)
+
+   15% first, which Rod tried and called too much; 10% is the setting. Exact
+   rather than rounded to whole pixels — a browser renders a fractional size
+   fine, and rounding three numbers by eye is how a "10% reduction" becomes
+   three different reductions.
+
+   Changing the scale again is one edit here rather than a hunt through six
+   files. That is the entire point of it living in this one place.
+   ========================================================================== */
+:root {
+  --fs-label: 10.8px;    /* every field title */
+  --fs-field: 12.15px;   /* every input, select and textarea */
+  --fs-dense: 11.25px;   /* table cells and the small controls beside fields */
+}
+
+/* ============================================================================
+   Page rhythm — the gaps between the rail, the form and the side panel
+   ============================================================================
+   Rod, 2026-09-22, about Loan/Property/Title and then again about Borrower
+   Info: "Adjust the width of the spaces between sections in the tab. Whatever
+   space we gain, add it to the right section of the Loan, Property and Title
+   tab as it feels too squeezed."
+
+   These were five numbers in five stylesheets — 45px here, 18px there, 16px
+   and 18px for the same kind of section break on two different tabs. Rod has
+   said it plainly more than once: "A pet peeve of mine is inconsistency." So
+   they are four numbers, defined once, and every tab reads them. Changing the
+   rhythm of the app is now one edit rather than a hunt.
+
+   The column gap was 45px and is 22px. The side panel keeps what that frees
+   plus what the rail gives back, which is the "too squeezed" complaint.
+   ========================================================================== */
+:root {
+  /* Rod, 2026-09-24, pointing at ARIVE: "see the size of the empty space on
+     the side between the main left nav bar and the application? It's thin,
+     to optimize space." 18px, then 10px, now 6px. */
+  --rail-gap: 6px;     /* left navigation rail  ->  content   (18px -> 10 -> 6) */
+  --col-gap:  22px;    /* form column           ->  side panel     (was 45px) */
+  --aside-w:  560px;   /* the side panel itself                    (was 520px) */
+  --sec-gap:  16px;    /* one stacked section   ->  the next                   */
+  /* Rod, 2026-09-28: the thin line beside the nav sits halfway between the
+     rail and the boxes — 16px was too much, 8px is right — and 2026-09-29:
+     "apply the same look to them all. 8 px." ONE value for every loan
+     screen (Loan, Borrower, Financial, Fees, Client Needs, Documents). */
+  --canvas-pad: 14px 8px;   /* a loan screen's edge -> its first box         */
+
+  /* Rod, 2026-09-29: "Apply the margins in the whole app just like the loan
+     file. I want the whole page filled, with the 8px or 16px separators, just
+     like the 1003." The loan file's measure, for every page: */
+  --page-max:    2200px;    /* stops a line running the width of an ultrawide */
+  --page-gutter: 18px;      /* the app's left nav -> the page (12px < 1500px)   */
+  --page-top:    12px;      /* the top bar -> the page                         */
+  --rail-w:      228px;     /* a page's own left rail (loan, contact, settings) */
+}
+@media (max-width: 1500px) { :root { --page-gutter: 12px; } }
+
+/* The page. Every page — Dashboard, Pipeline, Contacts, a contact, Settings,
+   Reports, the calculators — sits in the loan file's frame. */
+.rh-page { max-width: var(--page-max); margin: var(--page-top) auto; padding: 0 var(--page-gutter); }
+
+/* A page with its own left rail: the rail, 6px, then the grey canvas. */
+.rh-railed { display: grid; grid-template-columns: var(--rail-w) minmax(0, 1fr); gap: var(--rail-gap); align-items: start; }
+@media (max-width: 900px) { .rh-railed { grid-template-columns: 1fr; } }
+.rh-rail { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 8px 7px; display: flex; flex-direction: column; gap: 1px;
+  align-self: start; position: sticky; top: calc(var(--topbar-h, 56px) + 16px); }
+.rh-rail a { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: var(--radius-sm);
+  color: var(--text); text-decoration: none; font-size: 12.5px; font-weight: 500; transition: background 90ms; }
+.rh-rail a:hover { background: var(--bg); }
+.rh-rail a.active { background: rgba(14,102,168,.10); color: var(--brand-text); font-weight: 600; }
+.rh-rail-group { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--muted); padding: 8px 8px 6px; }
+.rh-rail-group:first-child { padding-top: 2px; }
+
+/* The grey canvas beside the rail: 8px in from it, 14px down, and the white
+   boxes on it 16px apart (.rh-panel) — the 1003's rhythm. A screen's title
+   sits on the canvas, above its boxes. */
+.rh-canvas-pane { background: var(--bg); padding: var(--canvas-pad); min-width: 0; }
+.rh-canvas-title { margin: 0 0 10px; font-size: 18px; font-weight: 700; color: var(--brand-2-text);
+  letter-spacing: -0.01em; border: 0; padding: 0; }
